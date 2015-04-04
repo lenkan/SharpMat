@@ -285,12 +285,7 @@ namespace SharpMat
         /// <summary>
         /// Reads a string of characters from the <see cref="BinaryReader"/>. A parameter
         /// indicates how many characters that should be read. Advances the reader to point
-        /// at the position after the string. 
-        /// <remarks>
-        /// This differs from the no-parameter ReadString method since that one
-        /// requires the length of the string to be the value of the first character
-        /// in the string to read.
-        /// </remarks>
+        /// at the position after the string.
         /// </summary>
         /// <param name="count">The number of characters to read from the reader and interpret as a string.</param>
         /// <returns>The string value of the characters read.</returns>
