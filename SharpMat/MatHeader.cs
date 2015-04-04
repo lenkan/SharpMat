@@ -9,6 +9,9 @@ namespace SharpMat
     {
         private string _descriptiveText;
 
+        /// <summary>
+        /// Creates a new <see cref="MatHeader"/> with the given header text.
+        /// </summary>
         public MatHeader(string text)
             : this(text, 256, false)
         {}
