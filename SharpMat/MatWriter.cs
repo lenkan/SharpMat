@@ -34,10 +34,28 @@ namespace SharpMat
             _writer.Write((short) 19785);
         }
 
+        /// <summary>
+        /// Writes the given <see cref="MatElementTag"/> to the underlying <see cref="Stream"/>.
+        /// </summary>
+        /// <param name="tag">The tag to write.</param>
         public void WriteElementTag(MatElementTag tag)
         {
-            _writer.Write((uint)tag.DataType);
-            _writer.Write(tag.DataSize);
+            //If small data size, write small format tag.
+            if (tag.DataSize <= 4)
+            {
+                uint tagValue = ((tag.DataSize << 16) & 0xFFFF0000) | (uint) tag.DataType;
+                _writer.Write(tagValue);
+            }
+            else
+            {
+                _writer.Write((uint) tag.DataType);
+                _writer.Write(tag.DataSize);
+            }
+        }
+
+        public void WriteByte(byte value)
+        {
+            _writer.Write(value);
         }
 
         public void WriteUInt32(IEnumerable<uint> values)
