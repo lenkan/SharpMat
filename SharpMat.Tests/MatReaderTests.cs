@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -10,10 +9,6 @@ namespace SharpMat.Tests
     [TestFixture]
     public class MatReaderTests
     {
-        #region Test helper methods
-
-        #endregion
-
         #region Reading value tests
 
         [Test]
@@ -257,7 +252,7 @@ namespace SharpMat.Tests
         [Test]
         public void ItShouldReturnNullWhenNoMoreElementsToRead()
         {
-            //This resource has for matrices, i.e. four elements.
+            //This resource has four matrices, i.e. four elements.
             var reader = MatReaderFactory.CreateWithData(Resources.Testing);
 
             var elements = new MatElementTag[5];
