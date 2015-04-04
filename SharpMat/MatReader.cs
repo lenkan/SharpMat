@@ -199,6 +199,7 @@ namespace SharpMat
             MatElementTag tag = ReadElementTag();
 
             //Set the value of next tag position.
+            //BUG: If the tag is a short tag, the tag is only 4 bytes. (Not sure if an element tag can be a short tag though).
             _nextTagPosition += 8 + tag.DataSize;
 
             if (tag.DataType == MatDataType.MiCompressed)
