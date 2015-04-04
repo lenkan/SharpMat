@@ -250,6 +250,22 @@ namespace SharpMat.Tests
         }
 
         [Test]
+        public void ItShouldBePossibleToReadValuesFromMatrixInFile()
+        {
+            var reader = MatReaderFactory.CreateWithData(Resources.SingleValue);
+
+            //The data is known, so just read the prerequisites and finally the value.
+            reader.ReadNextElementTag();
+            reader.ReadMatrixHeader();
+            reader.ReadElementTag();
+
+            //Since the single value is 1 and fits into UInt8, it is stored as a byte.
+            double value = (double)reader.ReadByte();
+
+            Assert.That(value, Is.EqualTo(1));
+        }
+
+        [Test]
         public void ItShouldReturnNullWhenNoMoreElementsToRead()
         {
             //This resource has four matrices, i.e. four elements.

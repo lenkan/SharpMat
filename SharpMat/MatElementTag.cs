@@ -33,5 +33,21 @@ namespace SharpMat
         {
             get; private set;
         }
+
+        /// <summary>
+        /// Gets a value that determines how many bytes that are padded after
+        /// the data belonging to the element that this tag refers to.
+        /// </summary>
+        internal int PaddingBytes
+        {
+            get
+            {
+                if (DataSize <= 4)
+                {
+                    return 4 - (int) DataSize;
+                }
+                return (int) DataSize % 8;
+            }
+        }
     }
 }

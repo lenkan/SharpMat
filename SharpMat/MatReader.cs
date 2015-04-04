@@ -237,6 +237,7 @@ namespace SharpMat
             //array name
             var nameTag = ReadElementTag();
             string title = ReadString((int)nameTag.DataSize);
+            Skip(nameTag.PaddingBytes);
 
             return new MatMatrixHeader
             {
@@ -278,8 +279,17 @@ namespace SharpMat
         public void Skip(int count)
         {
             AssertNotDisposed();
-            //TODO: Investigate uses when in decompressed state.
-            _stream.Seek(count, SeekOrigin.Current);
+            if (_inflatedStream == null)
+            {
+                _stream.Seek(count, SeekOrigin.Current);
+            }
+            else
+            {
+                for (int ii = 0; ii < count; ++ii)
+                {
+                    _inflatedStream.ReadByte();
+                }
+            }
         }
 
         /// <summary>
