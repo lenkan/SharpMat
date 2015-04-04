@@ -107,24 +107,12 @@ namespace SharpMat
         }
 
         /// <summary>
-        /// Gets or sets the endianness used when reading from the underlying stream.
-        /// This value is set internally when reading the header through <see cref="ReadHeader"/>,
-        /// to a value indicated by the data in the stream. However, it is possible to set it externally
-        /// as well. Beware that if a faulty value is set, the data read will be rubbish.
+        /// Gets a value indicating if byteswaps are required. This value is
+        /// set internally when reading the header of the .MAT-files
         /// </summary>
-        public Endianness Endianness { get; set; }
-
-        /// <summary>
-        /// Gets a value indicating if byteswaps are required. The value is
-        /// based on the endianness of the file and the endianness of this computer
-        /// architecture.
-        /// </summary>
-        private bool RequiresByteSwapping
+        public bool RequiresByteSwapping
         {
-            get
-            {
-                return IsDifferentEndianness(Endianness);
-            }
+            get; set;
         }
 
         /// <summary>
@@ -165,20 +153,19 @@ namespace SharpMat
             //Last two bytes of header is the endian indicator.
             //If it equals 19785, the endian of the data is same as this architecture,
             //thus no swaps are required.
-            bool endianIndicator;
             switch (ReadInt16())
             {
                 case 19785:
-                    endianIndicator = false;
+                    RequiresByteSwapping = false;
                     break;
                 case 18765:
-                    endianIndicator = true;
+                    RequiresByteSwapping = true;
                     break;
                 default:
                     throw new InvalidDataException("Invalid endian indicator in header.");
             }
 
-            _header = new MatHeader(text, version, endianIndicator);
+            _header = new MatHeader(text, version, RequiresByteSwapping);
             _nextTagPosition = _stream.Position;
             return _header;
         }
@@ -434,7 +421,7 @@ namespace SharpMat
         /// <summary>
         /// Helper method to read a value from the underlying stream while specifying a
         /// converter method to convert to the given type. This method uses <see cref="ReadByteArray"/>
-        /// which respects the current <see cref="Endianness"/>.
+        /// which respects if byte swapping should be performed.
         /// </summary>
         /// <typeparam name="T">The type of the value.</typeparam>
         /// <param name="size">The number of bytes the value is made up of.</param>
@@ -457,12 +444,6 @@ namespace SharpMat
             }
 
             return RequiresByteSwapping ? buffer.Reverse().ToArray() : buffer;
-        }
-
-        private static bool IsDifferentEndianness(Endianness endianness)
-        {
-            return (endianness == Endianness.LittleEndian && !BitConverter.IsLittleEndian) ||
-                       (endianness == Endianness.BigEndian && BitConverter.IsLittleEndian);
         }
 
         #endregion

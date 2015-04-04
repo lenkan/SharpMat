@@ -11,7 +11,14 @@ namespace SharpMat.Tests
     public class MatReaderTests
     {
         #region Test helper methods
-
+        
+        public  enum Endianness
+        {
+            Default,
+            LittleEndian,
+            BigEndian
+        }
+        
         private static MatReader CreateWithData(params byte[] data)
         {
             return CreateWithDataAndEncoding(Encoding.Default, data);
@@ -110,7 +117,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt16(Endianness endianness)
         {
             var reader = CreateWithInt16(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadInt16(), Is.EqualTo(37));
         }
 
@@ -120,7 +127,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt32(Endianness endianness)
         {
             var reader = CreateWithInt32(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadInt32(), Is.EqualTo(37));
         }
 
@@ -130,7 +137,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt64(Endianness endianness)
         {
             var reader = CreateWithInt64(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadInt64(), Is.EqualTo(37));
         }
 
@@ -141,7 +148,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint16(Endianness endianness)
         {
             var reader = CreateWithUint16(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadUInt16(), Is.EqualTo(37));
         }
 
@@ -151,7 +158,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint32(Endianness endianness)
         {
             var reader = CreateWithUint32(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadUInt32(), Is.EqualTo(37));
         }
 
@@ -161,7 +168,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint64(Endianness endianness)
         {
             var reader = CreateWithUint64(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadUInt64(), Is.EqualTo(37));
         }
 
@@ -171,7 +178,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingSingle(Endianness endianness)
         {
             var reader = CreateWithSingle(endianness, 37);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadSingle(), Is.EqualTo(37));
         }
 
@@ -181,7 +188,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingDouble(Endianness endianness)
         {
             var reader = CreateWithDouble(endianness, 789.231d);
-            reader.Endianness = endianness;
+            reader.RequiresByteSwapping = IsDifferentEndianness(endianness);
             Assert.That(reader.ReadDouble(), Is.EqualTo(789.231d));
         }
 
