@@ -7,30 +7,26 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpMat", "SharpMat\SharpM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharpMat.Tests", "SharpMat.Tests\SharpMat.Tests.csproj", "{80B526C7-DD37-4BB8-B7D4-697B35407863}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{53C756D7-3D74-4E58-80DC-EC677E54854F}"
+	ProjectSection(SolutionItems) = preProject
+		.travis.yml = .travis.yml
+		README.md = README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|x64 = Debug|x64
-		Debug|x86 = Debug|x86
-		Release|x64 = Release|x64
-		Release|x86 = Release|x86
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|x64.ActiveCfg = Debug|x64
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|x64.Build.0 = Debug|x64
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|x86.ActiveCfg = Debug|x86
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|x86.Build.0 = Debug|x86
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|x64.ActiveCfg = Release|x64
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|x64.Build.0 = Release|x64
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|x86.ActiveCfg = Release|x86
-		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|x86.Build.0 = Release|x86
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|x64.ActiveCfg = Debug|x64
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|x64.Build.0 = Debug|x64
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|x86.ActiveCfg = Debug|x86
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|x86.Build.0 = Debug|x86
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|x64.ActiveCfg = Release|x64
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|x64.Build.0 = Release|x64
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|x86.ActiveCfg = Release|x86
-		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|x86.Build.0 = Release|x86
+		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{27B62547-83A2-4F04-B4A6-54C60446801E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{27B62547-83A2-4F04-B4A6-54C60446801E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80B526C7-DD37-4BB8-B7D4-697B35407863}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

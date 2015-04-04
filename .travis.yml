@@ -4,5 +4,5 @@ install:
   - nuget restore SharpMat.sln
   - nuget install NUnit.Runners -Version 2.6.4 -OutputDirectory testrunner
 script:
-  - xbuild /p:Configuration=Debug /p:Platform=x64 SharpMat.sln
-  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./SharpMat.Tests/bin/x64/Debug/SharpMat.Tests.dll
+  - xbuild /p:Configuration=Debug /p:Platform="Any CPU" SharpMat.sln
+  - mono ./testrunner/NUnit.Runners.2.6.4/tools/nunit-console.exe ./SharpMat.Tests/bin/Debug/SharpMat.Tests.dll
