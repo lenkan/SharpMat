@@ -62,5 +62,18 @@ namespace SharpMat.Tests
                 Assert.That(element.GetValue(2), Is.EqualTo(3));
             }
         }
+
+        [Test]
+        public void ItShouldSupportAccessingTheValueFromMatrixWithCoordinates()
+        {
+            using (var stream = new MemoryStream(Resources.OneDimensionalArray))
+            using (var reader = new MatFileReader(stream, Encoding.Default))
+            {
+                var element = (MiMatrix)reader.ReadElement();
+                Assert.That(element.GetValue(0,0), Is.EqualTo(1));
+                Assert.That(element.GetValue(0,1), Is.EqualTo(2));
+                Assert.That(element.GetValue(0,2), Is.EqualTo(3));
+            }
+        }
     }
 }
