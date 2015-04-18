@@ -27,7 +27,7 @@ namespace SharpMat
 
         public object GetValue(params int[] coords)
         {
-            if (coords.Length != NumDimensions)
+            if (coords.Length > NumDimensions)
             {
                 throw new ArgumentException("Invalid number of coordinates");
             }

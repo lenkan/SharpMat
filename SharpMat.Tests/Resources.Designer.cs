@@ -63,6 +63,16 @@ namespace SharpMat.Tests {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        internal static byte[] OneDimensionalArray {
+            get {
+                object obj = ResourceManager.GetObject("OneDimensionalArray", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         internal static byte[] SingleValue {
             get {
                 object obj = ResourceManager.GetObject("SingleValue", resourceCulture);

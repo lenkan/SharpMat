@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace SharpMat
@@ -9,6 +10,11 @@ namespace SharpMat
     {
         private readonly MatReader _matReader;
         private MatHeader _matHeader;
+
+        public MatFileReader(Stream stream, Encoding encoding)
+        {
+            _matReader = new MatReader(stream, encoding);
+        }
 
         public MatFileReader(string file)
         {
@@ -46,53 +52,42 @@ namespace SharpMat
 
                 var valuesTag = _matReader.ReadElementTag();
 
-                List<double> values = new List<double>();
-                switch (valuesTag.DataType)
-                {
-                    case MatDataType.MiInt8:
-                        values.Add((double)_matReader.ReadByte());
-                        break;
-                    case MatDataType.MiUInt8:
-                        values.Add((double)_matReader.ReadByte());
-                        break;
-                    case MatDataType.MiInt16:
-                        values.Add((double)_matReader.ReadInt16());
-                        break;
-                    case MatDataType.MiUInt16:
-                        values.Add((double)_matReader.ReadUInt16());
-                        break;
-                    case MatDataType.MiInt32:
-                        values.Add((double)_matReader.ReadInt32());
-                        break;
-                    case MatDataType.MiUInt32:
-                        break;
-                    case MatDataType.MiSingle:
-                        break;
-                    case MatDataType.MiDouble:
-                        break;
-                    case MatDataType.MiInt64:
-                        break;
-                    case MatDataType.MiUInt64:
-                        break;
-                    case MatDataType.MiMatrix:
-                        break;
-                    case MatDataType.MiCompressed:
-                        break;
-                    case MatDataType.MiUtf8:
-                        break;
-                    case MatDataType.MiUtf16:
-                        break;
-                    case MatDataType.MiUtf32:
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                List<double> values = ReadValuesForTag(valuesTag).ToList();
                 _matReader.Skip(valuesTag.PaddingBytes);
+                
                 return new MiMatrix(tag, flags, name, dimensions, values);
             }
             else
             {
                 return null;
+            }
+        }
+
+        private IEnumerable<double> ReadValuesForTag(MatElementTag tag)
+        {
+            switch (tag.DataType)
+            {
+                case MatDataType.MiInt8:
+                case MatDataType.MiUInt8:
+                    return _matReader.ReadBytes(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiInt16:
+                    return _matReader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiUInt16:
+                    return _matReader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiInt32:
+                    return _matReader.ReadInt32Array(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiUInt32:
+                    return _matReader.ReadUInt32Array(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiSingle:
+                    return _matReader.ReadSingles(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiDouble:
+                    return _matReader.ReadDoubles(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiInt64:
+                    return _matReader.ReadInt64Array(tag.NumValues).Select(Convert.ToDouble);
+                case MatDataType.MiUInt64:
+                    return _matReader.ReadUInt64Array(tag.NumValues).Select(Convert.ToDouble);
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
         }
         

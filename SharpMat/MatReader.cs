@@ -221,6 +221,15 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Reads an array of <see cref="System.UInt16"/> values form the underlying stream.
+        /// </summary>
+        public byte[] ReadBytes(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadByte);
+        }
+
+        /// <summary>
         /// Reads a <see cref="System.UInt16"/> value.
         /// </summary>
         public ushort ReadUInt16()
@@ -230,12 +239,30 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Reads an array of <see cref="System.UInt16"/> values form the underlying stream.
+        /// </summary>
+        public ushort[] ReadUInt16Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadUInt16);
+        }
+
+        /// <summary>
         /// Reads a <see cref="System.UInt32"/> value.
         /// </summary>
         public uint ReadUInt32()
         {
             AssertNotDisposed();
             return ReadValue(4, BitConverter.ToUInt32);
+        }
+        
+        /// <summary>
+        /// Reads an array of <see cref="System.UInt32"/> values form the underlying stream.
+        /// </summary>
+        public uint[] ReadUInt32Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadUInt32);
         }
 
         /// <summary>
@@ -248,6 +275,15 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Reads an array of <see cref="System.UInt64"/> values form the underlying stream.
+        /// </summary>
+        public ulong[] ReadUInt64Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadUInt64);
+        }
+
+        /// <summary>
         /// Reads a <see cref="System.Int16"/> value.
         /// </summary>
         public short ReadInt16()
@@ -257,7 +293,16 @@ namespace SharpMat
         }
 
         /// <summary>
-        /// Reads a <see cref="System.UInt32"/> value.
+        /// Reads an array of <see cref="System.Int16"/> values from the underlying stream.
+        /// </summary>
+        public short[] ReadInt16Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadInt16);
+        }
+
+        /// <summary>
+        /// Reads a <see cref="System.Int32"/> value.
         /// </summary>
         public int ReadInt32()
         {
@@ -266,12 +311,30 @@ namespace SharpMat
         }
 
         /// <summary>
-        /// Reads a <see cref="System.UInt64"/> value.
+        /// Reads an array of <see cref="System.Int32"/> values from the underlying stream.
+        /// </summary>
+        public int[] ReadInt32Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadInt32);
+        }
+
+        /// <summary>
+        /// Reads a <see cref="System.Int64"/> value.
         /// </summary>
         public long ReadInt64()
         {
             AssertNotDisposed();
             return ReadValue(8, BitConverter.ToInt64);
+        }
+
+        /// <summary>
+        /// Reads an array of <see cref="System.Int64"/> values form the underlying stream.
+        /// </summary>
+        public long[] ReadInt64Array(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadInt64);
         }
 
         /// <summary>
@@ -284,6 +347,15 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Reads an array of <see cref="System.Single"/> values from the underlying stream.
+        /// </summary>
+        public float[] ReadSingles(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadSingle);
+        }
+
+        /// <summary>
         /// Reads a <see cref="System.Double"/> value.
         /// </summary>
         public double ReadDouble()
@@ -293,23 +365,21 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Reads an array of <see cref="System.Double"/> from the underlying stream.
+        /// </summary>
+        public double[] ReadDoubles(int count)
+        {
+            AssertNotDisposed();
+            return ReadArray(count, ReadDouble);
+        }
+
+        /// <summary>
         /// Reads a single character.
         /// </summary>
         public char ReadChar()
         {
             AssertNotDisposed();
             return ReadChars(1)[0];
-        }
-
-        public int[] ReadInt32Array(int count)
-        {
-            AssertNotDisposed();
-            int[] result = new int[count];
-            for (int ii = 0; ii < count; ++ii)
-            {
-                result[ii] = ReadInt32();
-            }
-            return result;
         }
 
         /// <summary>
@@ -327,6 +397,24 @@ namespace SharpMat
                 throw new EndOfStreamException("Not enough data in stream.");
             }
             return _encoding.GetChars(buffer);
+        }
+
+        /// <summary>
+        /// Helper method to read an array of values of the given type.
+        /// </summary>
+        /// <typeparam name="T">The type of values to read.</typeparam>
+        /// <param name="count">The number of values to read.</param>
+        /// <param name="readFunc">The function that reads one value.</param>
+        /// <returns>An array of length <paramref name="count"/> with read values.</returns>
+        private T[] ReadArray<T>(int count, Func<T> readFunc)
+        {
+            AssertNotDisposed();
+            T[] result = new T[count];
+            for (int ii = 0; ii < count; ++ii)
+            {
+                result[ii] = readFunc();
+            }
+            return result;
         }
 
         /// <summary>

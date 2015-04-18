@@ -38,7 +38,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MatFileTests.cs" />
+    <Compile Include="MatFileReaderIntegrationTests.cs" />
     <Compile Include="MatReaderFactory.cs" />
     <Compile Include="MatReaderTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -50,6 +50,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\OneDimensionalArray.mat" />
     <None Include="Resources\SingleValue.mat" />
     <None Include="Resources\Testing.mat" />
   </ItemGroup>

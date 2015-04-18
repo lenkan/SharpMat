@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using System.Linq;
+
 namespace SharpMat
 {
     public class MatElement
@@ -13,5 +16,12 @@ namespace SharpMat
         {
             get { return _tag; }
         }
+    }
+
+    public class MiNumericElement : MatElement
+    {
+        public MiNumericElement(MatElementTag tag, IEnumerable<byte> data)
+            : base(tag)
+        {}
     }
 }

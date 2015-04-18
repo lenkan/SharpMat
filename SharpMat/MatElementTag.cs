@@ -35,6 +35,14 @@ namespace SharpMat
         }
 
         /// <summary>
+        /// Gets the number of values that the corresponding element contains.
+        /// </summary>
+        public int NumValues
+        {
+            get { return (int)DataSize/DataType.GetDataTypeSize(); }
+        }
+
+        /// <summary>
         /// Gets a value that determines how many bytes that are padded after
         /// the data belonging to the element that this tag refers to.
         /// </summary>
@@ -46,7 +54,7 @@ namespace SharpMat
                 {
                     return 4 - (int) DataSize;
                 }
-                return (int) DataSize % 8;
+                return (int) (8 - DataSize) % 8;
             }
         }
     }

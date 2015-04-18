@@ -39,6 +39,7 @@
     <Compile Include="IBinaryReader.cs" />
     <Compile Include="MatArrayFlags.cs" />
     <Compile Include="MatArrayType.cs" />
+    <Compile Include="MatDataTypeExtensions.cs" />
     <Compile Include="MatElement.cs" />
     <Compile Include="MatElementTag.cs" />
     <Compile Include="MatDataType.cs" />

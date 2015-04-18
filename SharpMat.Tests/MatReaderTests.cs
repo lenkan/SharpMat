@@ -199,6 +199,16 @@ namespace SharpMat.Tests
             Assert.That(reader.ReadDouble(), Is.EqualTo(789.231d));
         }
 
+        [TestCase(Endianness.BigEndian)]
+        [TestCase(Endianness.LittleEndian)]
+        [TestCase(Endianness.Default)]
+        public void ItShouldSupportReadingDoubleArray(Endianness endianness)
+        {
+            var reader = MatReaderFactory.CreateWithDouble(endianness, 1d, 2, 3);
+            reader.Endianness = endianness;
+            Assert.That(reader.ReadDoubles(3), Is.EquivalentTo(new []{1d, 2, 3}));
+        }
+
         #endregion
 
         #region Reading characters and text tests
