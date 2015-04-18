@@ -39,10 +39,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MatFileTests.cs" />
-    <Compile Include="MatMatrixTests.cs" />
     <Compile Include="MatReaderFactory.cs" />
     <Compile Include="MatReaderTests.cs" />
-    <Compile Include="MatReaderAndMatWriterIntegrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Resources.Designer.cs">
       <AutoGen>True</AutoGen>
