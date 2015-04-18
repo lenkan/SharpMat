@@ -1,7 +1,6 @@
 ﻿using System.IO;
 using System.Text;
 using NUnit.Framework;
-using NUnit.Framework.Constraints;
 
 namespace SharpMat.Tests
 {
