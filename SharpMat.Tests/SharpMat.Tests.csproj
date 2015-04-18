@@ -38,7 +38,8 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Endianness.cs" />
+    <Compile Include="MatFileTests.cs" />
+    <Compile Include="MatMatrixTests.cs" />
     <Compile Include="MatReaderFactory.cs" />
     <Compile Include="MatReaderTests.cs" />
     <Compile Include="MatReaderAndMatWriterIntegrationTests.cs" />

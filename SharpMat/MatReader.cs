@@ -8,14 +8,15 @@ namespace SharpMat
 {
     /// <summary>
     /// Provides a way to read Matlab .MAT-files.
+    /// <remarks>
+    /// This class is basically a <see cref="System.IO.BinaryReader"/> that addresses
+    /// some of the specific needs required when reading .MAT files. Such as allowing
+    /// to change the endianness, reading .MAT specific binary elements, but also to allow
+    /// decompressing, see <see cref="BeginDecompress"/>, the underlying stream while reading.
+    /// </remarks>
     /// </summary>
     public class MatReader : IBinaryReader
     {
-        /// <summary>
-        /// The position of the next data tag in the underlying stream.
-        /// </summary>
-        private long _nextTagPosition;
-
         /// <summary>
         /// The encoding used to decode characters in the underlying stream.
         /// </summary>
@@ -42,11 +43,6 @@ namespace SharpMat
         /// </summary>
         private bool _isDisposed;
 
-        /// <summary>
-        /// The header from the mat file or null if it has not been read.
-        /// </summary>
-        private MatHeader _header;
-        
         /// <summary>
         /// Creates a new <see cref="MatReader"/> instance that reads from the given
         /// <see cref="Stream"/> and uses <see cref="Encoding.Default"/> when decoding
@@ -107,12 +103,27 @@ namespace SharpMat
         }
 
         /// <summary>
-        /// Gets a value indicating if byteswaps are required. This value is
-        /// set internally when reading the header of the .MAT-files
+        /// Gets or sets the endianness to use when reading numeric data.
+        /// <remarks>
+        /// Setting this to <see cref="SharpMat.Endianness.Default"/> will cause 
+        /// the reader to use the current computer architecture endianness when reading.
+        /// </remarks>
+        /// </summary>
+        public Endianness Endianness
+        {
+            get; set;
+        }
+
+        /// <summary>
+        /// Gets a value indicating if byteswaps are required.
         /// </summary>
         public bool RequiresByteSwapping
         {
-            get; set;
+            get
+            {
+                return (Endianness == Endianness.LittleEndian && !BitConverter.IsLittleEndian) ||
+                       (Endianness == Endianness.BigEndian && BitConverter.IsLittleEndian);
+            }
         }
 
         /// <summary>
@@ -127,102 +138,11 @@ namespace SharpMat
         }
 
         /// <summary>
-        /// Reads the MAT-header from the underlying stream. Before reading, the stream will be repositioned to the
-        /// beginning if not already there. Finally, the stream will be positioned at the first data element tag.
+        /// Reads an instance of <see cref="MatArrayFlags"/>. This data is organized as
+        /// two UInt32 valkues, thus reading this will read 8 bytes of data.
         /// </summary>
-        /// <returns>A new <see cref="MatHeader"/> instance.</returns>
-        public MatHeader ReadHeader()
+        public MatArrayFlags ReadArrayFlags()
         {
-            AssertNotDisposed();
-
-            EndDecompress();
-            if (_stream.Position != 0)
-            {
-                _stream.Seek(0, SeekOrigin.Begin);
-            }
-            
-            //First 116 bytes is description string
-            string text = ReadString(116).Trim();
-
-            //Skip next 8 bytes according to specification
-            Skip(8);
-
-            //Then, next two bytes is version
-            short version = ReadInt16();
-
-            //Last two bytes of header is the endian indicator.
-            //If it equals 19785, the endian of the data is same as this architecture,
-            //thus no swaps are required.
-            switch (ReadInt16())
-            {
-                case 19785:
-                    RequiresByteSwapping = false;
-                    break;
-                case 18765:
-                    RequiresByteSwapping = true;
-                    break;
-                default:
-                    throw new InvalidDataException("Invalid endian indicator in header.");
-            }
-
-            _header = new MatHeader(text, version, RequiresByteSwapping);
-            _nextTagPosition = _stream.Position;
-            return _header;
-        }
-
-        /// <summary>
-        /// Reads the next <see cref="MatElementTag"/> from the underlying stream.
-        /// If the data is compressed, this method will decompress and return the
-        /// decompressed information.
-        /// </summary>
-        public MatElementTag ReadNextElementTag()
-        {
-            AssertNotDisposed();
-
-            //If not header has been read, make sure to read it.
-            if (_header == null)
-            {
-                ReadHeader();
-            }
-
-            //Stop decompressing if currently in decompress mode.
-            EndDecompress();
-            if (_stream.Position != _nextTagPosition)
-            {
-                _stream.Position = _nextTagPosition;
-            }
-            if (_stream.Position >= _stream.Length)
-            {
-                return null;
-            }
-
-            MatElementTag tag = ReadElementTag();
-
-            //Set the value of next tag position.
-            //BUG: If the tag is a short tag, the tag is only 4 bytes. (Not sure if an element tag can be a short tag though).
-            _nextTagPosition += 8 + tag.DataSize;
-
-            if (tag.DataType == MatDataType.MiCompressed)
-            {
-                //If compressed, skip zip header and decompress before reading
-                _stream.Seek(2, SeekOrigin.Current);
-                BeginDecompress((int)tag.DataSize - 2);
-                tag = ReadElementTag();
-            }
-
-            return tag;
-        }
-
-        /// <summary>
-        /// Reads the next <see cref="MatMatrixHeader"/> from the underlying stream.
-        /// </summary>
-        /// <exception cref="EndOfStreamException"/>
-        public MatMatrixHeader ReadMatrixHeader()
-        {
-            AssertNotDisposed();
-
-            //Flags
-            ReadElementTag();
             uint flags = ReadUInt32();
             bool complex = (flags & 0x00000800) == 0x0800;
             bool global = (flags & 0x00000400) == 0x0400;
@@ -230,24 +150,7 @@ namespace SharpMat
             MatArrayType type = (MatArrayType)(flags & 0x000000FF);
             ReadUInt32();
 
-            //Dimensions
-            var dimensionsTag = ReadElementTag();
-            int[] dimensions = ReadInt32Array((int)dimensionsTag.DataSize / 4);
-
-            //array name
-            var nameTag = ReadElementTag();
-            string title = ReadString((int)nameTag.DataSize);
-            Skip(nameTag.PaddingBytes);
-
-            return new MatMatrixHeader
-            {
-                Complex = complex,
-                Global = global,
-                Logical = logical,
-                ArrayType = type,
-                Dimensions = dimensions,
-                Name = title
-            };
+            return new MatArrayFlags {Complex = complex, Global = global, Logical = logical, ArrayType = type};
         }
 
         /// <summary>
@@ -257,6 +160,7 @@ namespace SharpMat
         public MatElementTag ReadElementTag()
         {
             AssertNotDisposed();
+
             uint type = ReadUInt32();
             uint size;
             if (type > 256)
@@ -268,6 +172,7 @@ namespace SharpMat
             {
                 size = ReadUInt32();
             }
+            
             return new MatElementTag((MatDataType)type, size);
         }
 

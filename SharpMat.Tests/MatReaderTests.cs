@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
@@ -9,6 +11,99 @@ namespace SharpMat.Tests
     [TestFixture]
     public class MatReaderTests
     {
+        #region Reading element and tags tests
+
+        [Test]
+        public void ItShouldSupportReadingNormalElementTag()
+        {
+            //Data type = 1 => MiInt8, size = 255
+            var data = new byte[] {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xFF };
+            var reader = MatReaderFactory.CreateWithData(data);
+            reader.Endianness = Endianness.BigEndian;
+
+            var tag = reader.ReadElementTag();
+            Assert.That(tag.DataType, Is.EqualTo(MatDataType.MiInt8));
+            Assert.That(tag.DataSize, Is.EqualTo(255));
+        }
+
+        [Test]
+        public void ItShouldSupportReadingSmallFormatElementTag()
+        {
+            var data = new byte[] {0x00, 0x02, 0x00, 0x01};
+            var reader = MatReaderFactory.CreateWithData(data);
+            reader.Endianness = Endianness.BigEndian;
+
+            var tag = reader.ReadElementTag();
+            Assert.That(tag.DataType, Is.EqualTo(MatDataType.MiInt8));
+            Assert.That(tag.DataSize, Is.EqualTo(2));
+        }
+
+        [TestCase(MatArrayType.MxCell)]
+        [TestCase(MatArrayType.MxChar)]
+        [TestCase(MatArrayType.MxDouble)]
+        [TestCase(MatArrayType.MxInt16)]
+        [TestCase(MatArrayType.MxInt32)]
+        [TestCase(MatArrayType.MxInt64)]
+        [TestCase(MatArrayType.MxInt8)]
+        [TestCase(MatArrayType.MxObject)]
+        [TestCase(MatArrayType.MxSingle)]
+        [TestCase(MatArrayType.MxSparse)]
+        [TestCase(MatArrayType.MxStruct)]
+        [TestCase(MatArrayType.MxUInt16)]
+        [TestCase(MatArrayType.MxUInt32)]
+        [TestCase(MatArrayType.MxUInt64)]
+        [TestCase(MatArrayType.MxUInt8)]
+        public void ItShouldSupportReadingArrayFlags(MatArrayType arrayType)
+        {
+            const byte complex = 1 << 3;
+            const byte global = 1 << 2;
+            const byte logical = 1 << 1;
+
+            byte[] data = new byte[8*7];
+            data[2] = complex;
+            data[3] = (byte)arrayType;
+            data[8 + 2] = global;
+            data[8 + 3] = (byte) arrayType;
+            data[16 + 2] = logical;
+            data[16 + 3] = (byte)arrayType;
+            data[24 + 2] = complex | global;
+            data[24 + 3] = (byte)arrayType;
+            data[32 + 2] = complex | logical;
+            data[32 + 3] = (byte)arrayType;
+            data[40 + 2] = complex | logical | global;
+            data[40 + 3] = (byte)arrayType;
+            data[48 + 2] = logical | global;
+            data[48 + 3] = (byte)arrayType;
+
+
+            var reader = MatReaderFactory.CreateWithData(data);
+            reader.Endianness = Endianness.BigEndian;
+            MatArrayFlags[] flagses = 
+            {
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags(),
+                reader.ReadArrayFlags()
+            };
+
+            Assert.That(flagses.Select(x => x.ArrayType), Is.All.EqualTo(arrayType));
+            Assert.That(flagses.Select(x => new[] {x.Complex, x.Global, x.Logical}), Is.EquivalentTo(new List<bool[]>
+            {
+                new []{true, false, false},
+                new []{false, true, false},
+                new []{false, false, true},
+                new []{true, true, false},
+                new []{true, false, true},
+                new []{true, true, true},
+                new []{false, true, true},
+            }));
+        }
+
+        #endregion
+
         #region Reading value tests
 
         [Test]
@@ -29,7 +124,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt16(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithInt16(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadInt16(), Is.EqualTo(37));
         }
 
@@ -39,7 +134,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt32(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithInt32(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadInt32(), Is.EqualTo(37));
         }
 
@@ -49,7 +144,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingInt64(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithInt64(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadInt64(), Is.EqualTo(37));
         }
 
@@ -60,7 +155,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint16(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithUint16(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadUInt16(), Is.EqualTo(37));
         }
 
@@ -70,7 +165,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint32(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithUint32(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadUInt32(), Is.EqualTo(37));
         }
 
@@ -80,7 +175,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingUint64(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithUint64(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadUInt64(), Is.EqualTo(37));
         }
 
@@ -90,7 +185,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingSingle(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithSingle(endianness, 37);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadSingle(), Is.EqualTo(37));
         }
 
@@ -100,7 +195,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingDouble(Endianness endianness)
         {
             var reader = MatReaderFactory.CreateWithDouble(endianness, 789.231d);
-            reader.RequiresByteSwapping = MatReaderFactory.IsDifferentEndianness(endianness);
+            reader.Endianness = endianness;
             Assert.That(reader.ReadDouble(), Is.EqualTo(789.231d));
         }
 
@@ -170,13 +265,10 @@ namespace SharpMat.Tests
             Assert.That(() => reader.ReadChars(1), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadDouble(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadElementTag(), Throws.InstanceOf<ObjectDisposedException>());
-            Assert.That(() => reader.ReadHeader(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadInt16(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadInt32(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadInt32Array(1), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadInt64(), Throws.InstanceOf<ObjectDisposedException>());
-            Assert.That(() => reader.ReadMatrixHeader(), Throws.InstanceOf<ObjectDisposedException>());
-            Assert.That(() => reader.ReadNextElementTag(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadSingle(), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadString(1), Throws.InstanceOf<ObjectDisposedException>());
             Assert.That(() => reader.ReadUInt16(), Throws.InstanceOf<ObjectDisposedException>());
@@ -228,61 +320,6 @@ namespace SharpMat.Tests
             Assert.That(value1, Is.EqualTo(1));
             Assert.That(value2, Is.EqualTo(2));
             Assert.That(value3, Is.EqualTo(1));
-        }
-
-        #endregion
-
-        #region Resources dependent tests
-
-        [Test]
-        public void ItShouldBePosssibleToReadNextElementTagAndMatrixWithoutReadingHeaderFirst()
-        {
-            //This resource has a single element, 'x' = 1
-            var reader = MatReaderFactory.CreateWithData(Resources.SingleValue);
-
-            var element = reader.ReadNextElementTag();
-            Assert.That(element.DataType, Is.EqualTo(MatDataType.MiMatrix));
-
-            var matrix = reader.ReadMatrixHeader();
-            Assert.That(matrix.ArrayType, Is.EqualTo(MatArrayType.MxDouble));
-            Assert.That(matrix.Name, Is.EqualTo("x"));
-            Assert.That(matrix.Dimensions, Is.EquivalentTo(new []{1, 1}));
-        }
-
-        [Test]
-        public void ItShouldBePossibleToReadValuesFromMatrixInFile()
-        {
-            var reader = MatReaderFactory.CreateWithData(Resources.SingleValue);
-
-            //The data is known, so just read the prerequisites and finally the value.
-            reader.ReadNextElementTag();
-            reader.ReadMatrixHeader();
-            reader.ReadElementTag();
-
-            //Since the single value is 1 and fits into UInt8, it is stored as a byte.
-            double value = (double)reader.ReadByte();
-
-            Assert.That(value, Is.EqualTo(1));
-        }
-
-        [Test]
-        public void ItShouldReturnNullWhenNoMoreElementsToRead()
-        {
-            //This resource has four matrices, i.e. four elements.
-            var reader = MatReaderFactory.CreateWithData(Resources.Testing);
-
-            var elements = new MatElementTag[5];
-            elements[0] = reader.ReadNextElementTag();
-            elements[1] = reader.ReadNextElementTag();
-            elements[2] = reader.ReadNextElementTag();
-            elements[3] = reader.ReadNextElementTag();
-            elements[4] = reader.ReadNextElementTag();
-
-            Assert.That(elements[0], Is.Not.Null);
-            Assert.That(elements[1], Is.Not.Null);
-            Assert.That(elements[2], Is.Not.Null);
-            Assert.That(elements[3], Is.Not.Null);
-            Assert.That(elements[4], Is.Null);
         }
 
         #endregion

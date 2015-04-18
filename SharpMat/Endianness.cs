@@ -1,6 +1,6 @@
-namespace SharpMat.Tests
+namespace SharpMat
 {
-    public  enum Endianness
+    public enum Endianness
     {
         Default,
         LittleEndian,

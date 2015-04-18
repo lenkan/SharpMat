@@ -35,14 +35,19 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Endianness.cs" />
     <Compile Include="IBinaryReader.cs" />
+    <Compile Include="MatArrayFlags.cs" />
     <Compile Include="MatArrayType.cs" />
+    <Compile Include="MatElement.cs" />
     <Compile Include="MatElementTag.cs" />
     <Compile Include="MatDataType.cs" />
+    <Compile Include="MatFileReader.cs" />
     <Compile Include="MatHeader.cs" />
     <Compile Include="MatMatrixHeader.cs" />
     <Compile Include="MatReader.cs" />
     <Compile Include="MatWriter.cs" />
+    <Compile Include="MiMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
