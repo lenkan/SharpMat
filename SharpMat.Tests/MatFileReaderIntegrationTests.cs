@@ -3,8 +3,8 @@ using NUnit.Framework;
 
 namespace SharpMat.Tests
 {
-    [TestFixture]
-    public class MatFileTests
+    [TestFixture(Description = "Tests the intended uses of the API by reading from the file system.")]
+    public class MatFileReaderIntegrationTests
     {
         [SetUp]
         public void SetUp()
@@ -35,6 +35,16 @@ namespace SharpMat.Tests
             {
                 var element = (MiMatrix)reader.ReadElement();
                 Assert.That(element.Name, Is.EqualTo("x"));
+            }
+        }
+
+        [Test]
+        public void ItShouldSupportReadingValueFromMatrix()
+        {
+            using (var reader = new MatFileReader("test.mat"))
+            {
+                var element = (MiMatrix) reader.ReadElement();
+                Assert.That(element.GetValue(0,0), Is.EqualTo(1));
             }
         }
     }

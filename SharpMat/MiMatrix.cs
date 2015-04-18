@@ -31,8 +31,7 @@ namespace SharpMat
             {
                 throw new ArgumentException("Invalid number of coordinates");
             }
-
-            return _values[3*coords[0] + 2*coords[1] + 1*coords[2]];
+            return _values[coords[0]];
         }
     }
 }
