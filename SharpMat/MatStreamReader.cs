@@ -7,15 +7,13 @@ using System.Text;
 namespace SharpMat
 {
     /// <summary>
-    /// Provides a way to read Matlab .MAT-files.
-    /// <remarks>
+    /// Provides a way to read data from a stream representing a Matlab .MAT-file.
     /// This class is basically a <see cref="System.IO.BinaryReader"/> that addresses
     /// some of the specific needs required when reading .MAT files. Such as allowing
     /// to change the endianness, reading .MAT specific binary elements, but also to allow
     /// decompressing, see <see cref="BeginDecompress"/>, the underlying stream while reading.
-    /// </remarks>
     /// </summary>
-    public class MatReader : IBinaryReader
+    public class MatStreamReader : IBinaryReader
     {
         /// <summary>
         /// The encoding used to decode characters in the underlying stream.
@@ -44,7 +42,7 @@ namespace SharpMat
         private bool _isDisposed;
 
         /// <summary>
-        /// Creates a new <see cref="MatReader"/> instance that reads from the given
+        /// Creates a new <see cref="MatStreamReader"/> instance that reads from the given
         /// <see cref="Stream"/> and uses <see cref="Encoding.Default"/> when decoding
         /// characters. The given <see cref="Stream"/> will be disposed when disposing
         /// this instance.
@@ -52,11 +50,11 @@ namespace SharpMat
         /// <param name="input">The <see cref="Stream"/> to read from.</param>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentException" />
-        public MatReader(Stream input) : this(input, Encoding.Default)
+        public MatStreamReader(Stream input) : this(input, Encoding.Default)
         {}
 
         /// <summary>
-        /// Creates a new <see cref="MatReader"/> instance that reads from the given
+        /// Creates a new <see cref="MatStreamReader"/> instance that reads from the given
         /// <see cref="Stream"/> and uses the given encoding when decoding
         /// characters. The given <see cref="Stream"/> will be disposed when disposing
         /// this instance.
@@ -65,11 +63,11 @@ namespace SharpMat
         /// <param name="encoding">The <see cref="Encoding"/> to use when decoding characters.</param>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentException" />
-        public MatReader(Stream input, Encoding encoding) : this(input, encoding, false)
+        public MatStreamReader(Stream input, Encoding encoding) : this(input, encoding, false)
         {}
 
         /// <summary>
-        /// Creates a new <see cref="MatReader"/> instance that reads from the given
+        /// Creates a new <see cref="MatStreamReader"/> instance that reads from the given
         /// <see cref="Stream"/> and uses the given encoding when decoding
         /// characters. A value indicates if the given <see cref="Stream"/> should
         /// be disposed when disposing this instance.
@@ -82,7 +80,7 @@ namespace SharpMat
         /// </param>
         /// <exception cref="ArgumentNullException" />
         /// <exception cref="ArgumentException" />
-        public MatReader(Stream input, Encoding encoding, bool leaveOpen)
+        public MatStreamReader(Stream input, Encoding encoding, bool leaveOpen)
         {
             if (input == null)
             {
@@ -511,7 +509,7 @@ namespace SharpMat
         {
             if (_isDisposed)
             {
-                throw new ObjectDisposedException("MatReader");
+                throw new ObjectDisposedException("MatStreamReader");
             }
         }
 

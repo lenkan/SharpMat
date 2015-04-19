@@ -8,52 +8,52 @@ namespace SharpMat
 {
     public class MatFileReader : IDisposable
     {
-        private readonly MatReader _matReader;
+        private readonly MatStreamReader _reader;
         private MatHeader _matHeader;
 
         public MatFileReader(Stream stream, Encoding encoding)
         {
-            _matReader = new MatReader(stream, encoding);
+            _reader = new MatStreamReader(stream, encoding);
         }
 
         public MatFileReader(string file)
         {
-            _matReader = new MatReader(File.OpenRead(file), Encoding.Default, false);
+            _reader = new MatStreamReader(File.OpenRead(file), Encoding.Default, false);
         }
 
         public MatElement ReadElement()
         {
             if (_matHeader == null)
             {
-                _matHeader = ReadHeader(_matReader);
+                _matHeader = ReadHeader(_reader);
             }
 
-            _matReader.EndDecompress();
-            var tag = _matReader.ReadElementTag();
+            _reader.EndDecompress();
+            var tag = _reader.ReadElementTag();
             if (tag.DataType == MatDataType.MiCompressed)
             {
-                _matReader.Skip(2);
-                _matReader.BeginDecompress((int)tag.DataSize - 2);
-                tag = _matReader.ReadElementTag();
+                _reader.Skip(2);
+                _reader.BeginDecompress((int)tag.DataSize - 2);
+                tag = _reader.ReadElementTag();
             }
 
             if (tag.DataType == MatDataType.MiMatrix)
             {
-                var flagsTag = _matReader.ReadElementTag();
-                var flags = _matReader.ReadArrayFlags();
+                var flagsTag = _reader.ReadElementTag();
+                var flags = _reader.ReadArrayFlags();
 
-                var dimensionsTag = _matReader.ReadElementTag();
-                int[] dimensions = _matReader.ReadInt32Array((int)dimensionsTag.DataSize / 4);
-                _matReader.Skip(dimensionsTag.PaddingBytes);
+                var dimensionsTag = _reader.ReadElementTag();
+                int[] dimensions = _reader.ReadInt32Array((int)dimensionsTag.DataSize / 4);
+                _reader.Skip(dimensionsTag.PaddingBytes);
 
-                var nameTag = _matReader.ReadElementTag();
-                string name = _matReader.ReadString((int)nameTag.DataSize);
-                _matReader.Skip(nameTag.PaddingBytes);
+                var nameTag = _reader.ReadElementTag();
+                string name = _reader.ReadString((int)nameTag.DataSize);
+                _reader.Skip(nameTag.PaddingBytes);
 
-                var valuesTag = _matReader.ReadElementTag();
+                var valuesTag = _reader.ReadElementTag();
 
                 List<double> values = ReadValuesForTag(valuesTag).ToList();
-                _matReader.Skip(valuesTag.PaddingBytes);
+                _reader.Skip(valuesTag.PaddingBytes);
                 
                 return new MiMatrix(tag, flags, name, dimensions, values);
             }
@@ -69,23 +69,23 @@ namespace SharpMat
             {
                 case MatDataType.MiInt8:
                 case MatDataType.MiUInt8:
-                    return _matReader.ReadBytes(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadBytes(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiInt16:
-                    return _matReader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiUInt16:
-                    return _matReader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadInt16Array(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiInt32:
-                    return _matReader.ReadInt32Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadInt32Array(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiUInt32:
-                    return _matReader.ReadUInt32Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadUInt32Array(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiSingle:
-                    return _matReader.ReadSingles(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadSingles(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiDouble:
-                    return _matReader.ReadDoubles(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadDoubles(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiInt64:
-                    return _matReader.ReadInt64Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadInt64Array(tag.NumValues).Select(Convert.ToDouble);
                 case MatDataType.MiUInt64:
-                    return _matReader.ReadUInt64Array(tag.NumValues).Select(Convert.ToDouble);
+                    return _reader.ReadUInt64Array(tag.NumValues).Select(Convert.ToDouble);
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -121,6 +121,8 @@ namespace SharpMat
             return new MatHeader(text, version, swap);
         }
 
+        #region IDisposable
+
         public void Dispose()
         {
             Dispose(true);
@@ -131,11 +133,13 @@ namespace SharpMat
         {
             if (disposing)
             {
-                if (_matReader != null)
+                if (_reader != null)
                 {
-                    _matReader.Dispose();
+                    _reader.Dispose();
                 }
             }
         }
+
+        #endregion
     }
 }

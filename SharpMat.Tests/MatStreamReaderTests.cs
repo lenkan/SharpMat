@@ -9,7 +9,7 @@ using NUnit.Framework;
 namespace SharpMat.Tests
 {
     [TestFixture]
-    public class MatReaderTests
+    public class MatStreamReaderTests
     {
         #region Reading element and tags tests
 
@@ -18,7 +18,7 @@ namespace SharpMat.Tests
         {
             //Data type = 1 => MiInt8, size = 255
             var data = new byte[] {0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0xFF };
-            var reader = MatReaderFactory.CreateWithData(data);
+            var reader = MatStreamReaderFactory.CreateWithData(data);
             reader.Endianness = Endianness.BigEndian;
 
             var tag = reader.ReadElementTag();
@@ -30,7 +30,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingSmallFormatElementTag()
         {
             var data = new byte[] {0x00, 0x02, 0x00, 0x01};
-            var reader = MatReaderFactory.CreateWithData(data);
+            var reader = MatStreamReaderFactory.CreateWithData(data);
             reader.Endianness = Endianness.BigEndian;
 
             var tag = reader.ReadElementTag();
@@ -76,7 +76,7 @@ namespace SharpMat.Tests
             data[48 + 3] = (byte)arrayType;
 
 
-            var reader = MatReaderFactory.CreateWithData(data);
+            var reader = MatStreamReaderFactory.CreateWithData(data);
             reader.Endianness = Endianness.BigEndian;
             MatArrayFlags[] flagses = 
             {
@@ -110,7 +110,7 @@ namespace SharpMat.Tests
         public void ItShouldSupportReadingBytesFromStream()
         {
             var data = new byte[] {0x01, 0x02};
-            var reader = MatReaderFactory.CreateWithData(data);
+            var reader = MatStreamReaderFactory.CreateWithData(data);
             var byte1 = reader.ReadByte();
             var byte2 = reader.ReadByte();
 
@@ -123,7 +123,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingInt16(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithInt16(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithInt16(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadInt16(), Is.EqualTo(37));
         }
@@ -133,7 +133,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingInt32(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithInt32(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithInt32(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadInt32(), Is.EqualTo(37));
         }
@@ -143,7 +143,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingInt64(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithInt64(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithInt64(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadInt64(), Is.EqualTo(37));
         }
@@ -154,7 +154,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingUint16(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithUint16(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithUint16(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadUInt16(), Is.EqualTo(37));
         }
@@ -164,7 +164,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingUint32(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithUint32(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithUint32(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadUInt32(), Is.EqualTo(37));
         }
@@ -174,7 +174,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingUint64(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithUint64(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithUint64(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadUInt64(), Is.EqualTo(37));
         }
@@ -184,7 +184,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingSingle(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithSingle(endianness, 37);
+            var reader = MatStreamReaderFactory.CreateWithSingle(endianness, 37);
             reader.Endianness = endianness;
             Assert.That(reader.ReadSingle(), Is.EqualTo(37));
         }
@@ -194,7 +194,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingDouble(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithDouble(endianness, 789.231d);
+            var reader = MatStreamReaderFactory.CreateWithDouble(endianness, 789.231d);
             reader.Endianness = endianness;
             Assert.That(reader.ReadDouble(), Is.EqualTo(789.231d));
         }
@@ -204,7 +204,7 @@ namespace SharpMat.Tests
         [TestCase(Endianness.Default)]
         public void ItShouldSupportReadingDoubleArray(Endianness endianness)
         {
-            var reader = MatReaderFactory.CreateWithDouble(endianness, 1d, 2, 3);
+            var reader = MatStreamReaderFactory.CreateWithDouble(endianness, 1d, 2, 3);
             reader.Endianness = endianness;
             Assert.That(reader.ReadDoubles(3), Is.EquivalentTo(new []{1d, 2, 3}));
         }
@@ -220,7 +220,7 @@ namespace SharpMat.Tests
         {
             var encoding = Encoding.GetEncoding(encodingName);
             byte[] data = encoding.GetBytes("chars");
-            var reader = MatReaderFactory.CreateWithDataAndEncoding(encoding, data);
+            var reader = MatStreamReaderFactory.CreateWithDataAndEncoding(encoding, data);
             Assert.That(reader.ReadChar(), Is.EqualTo('c'));
             Assert.That(reader.ReadChar(), Is.EqualTo('h'));
             Assert.That(reader.ReadChar(), Is.EqualTo('a'));
@@ -235,7 +235,7 @@ namespace SharpMat.Tests
         {
             var encoding = Encoding.GetEncoding(encodingName);
             byte[] data = encoding.GetBytes("chars");
-            var reader = MatReaderFactory.CreateWithDataAndEncoding(encoding, data);
+            var reader = MatStreamReaderFactory.CreateWithDataAndEncoding(encoding, data);
             Assert.That(reader.ReadChars(5), Is.EquivalentTo(new []{'c', 'h', 'a', 'r', 's'}));
         }
 
@@ -246,7 +246,7 @@ namespace SharpMat.Tests
         {
             var encoding = Encoding.GetEncoding(encodingName);
             byte[] data = encoding.GetBytes("string");
-            var reader = MatReaderFactory.CreateWithDataAndEncoding(encoding, data);
+            var reader = MatStreamReaderFactory.CreateWithDataAndEncoding(encoding, data);
             Assert.That(reader.ReadString(6), Is.EqualTo("string"), "Failed with encoding: " + encodingName);
         }
 
@@ -259,7 +259,7 @@ namespace SharpMat.Tests
         {
             using (var stream = new MemoryStream())
             {
-                var reader = new MatReader(stream);
+                var reader = new MatStreamReader(stream);
                 Assert.That(() => reader.ReadByte(), Throws.InstanceOf<EndOfStreamException>());
             }
         }
@@ -267,7 +267,7 @@ namespace SharpMat.Tests
         [Test]
         public void ItShouldThrowObjectDisposedExceptionIfUsedAfterDisposabl()
         {
-            var reader = MatReaderFactory.CreateWithData(0x00, 0x01);
+            var reader = MatStreamReaderFactory.CreateWithData(0x00, 0x01);
             reader.Dispose();
 
             Assert.That(() => reader.ReadByte(), Throws.InstanceOf<ObjectDisposedException>());
@@ -320,7 +320,7 @@ namespace SharpMat.Tests
                 data = memoryStream.ToArray();
             }
 
-            var reader = MatReaderFactory.CreateWithData(data);
+            var reader = MatStreamReaderFactory.CreateWithData(data);
             var value1 = reader.ReadUInt32();
             reader.BeginDecompress(compressedSize); //Decompress for given number of bytes
             var value2 = reader.ReadInt64();

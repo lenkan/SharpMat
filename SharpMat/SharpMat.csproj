@@ -46,7 +46,7 @@
     <Compile Include="MatFileReader.cs" />
     <Compile Include="MatHeader.cs" />
     <Compile Include="MatMatrixHeader.cs" />
-    <Compile Include="MatReader.cs" />
+    <Compile Include="MatStreamReader.cs" />
     <Compile Include="MatWriter.cs" />
     <Compile Include="MiMatrix.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
